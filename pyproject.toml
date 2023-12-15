@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "inranker"
+version = "0.1"
+authors = [
+    { name = "Thiago Laitz", email = "thiagolaitz@gmail.com" },
+]
+requires-python = ">=3.10"
+
+dependencies = [
+    "torch==2.1.1",
+    "transformers==4.36.1",
+    "sentencepiece==0.1.99",
+    "protobuf==4.25.1",
+]
