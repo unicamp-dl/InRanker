@@ -1,5 +1,5 @@
 # InRanker
-This library provides a simple way for testing the InRanker models, which are also directly accessible on [Hugging Face](https://huggingface.co/unicamp-dl)
+This library provides a simple way for testing the InRanker models, which are also directly accessible at [Hugging Face](https://huggingface.co/unicamp-dl)
 
 ## Setup
 This library was tested using python 3.10 and can be installed using pip.
@@ -39,4 +39,13 @@ sorted_scores = [
 ```
 
 ## How to Cite
-
+```
+@misc{laitz2024inranker,
+      title={InRanker: Distilled Rankers for Zero-shot Information Retrieval}, 
+      author={Thiago Laitz and Konstantinos Papakostas and Roberto Lotufo and Rodrigo Nogueira},
+      year={2024},
+      eprint={2401.06910},
+      archivePrefix={arXiv},
+      primaryClass={cs.IR}
+}
+```
