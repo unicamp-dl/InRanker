@@ -26,7 +26,8 @@ class InRankerTrainer:
         gradient_accumulation_steps: int = 1,
         bf16: bool = False,
         gradient_checkpointing: bool = False,
-        device: str = None,
+        device: str = "",
+        output_dir: str = "trained_model",
         **kwargs,
     ):
         """
@@ -45,16 +46,15 @@ class InRankerTrainer:
             device: Device to use (e.g. "cuda:0", "cpu").
             **kwargs: Additional arguments to be passed to the Huggingface Trainer.
         """
-        # Model
-        self.model = model
         # Training Arguments
-        self.training_arguments = TrainingArguments()
+        self.training_arguments = TrainingArguments(output_dir=output_dir)
         self.training_arguments.warmup_steps = warmup_steps
         self.training_arguments.num_train_epochs = num_train_epochs
         self.training_arguments.logging_steps = logging_steps
         self.training_arguments.save_steps = save_steps
         self.training_arguments.learning_rate = learning_rate
         self.training_arguments.per_device_train_batch_size = batch_size
+        self.training_arguments._n_gpu = 1 if "cuda" in device else 0
         self.training_arguments.gradient_accumulation_steps = (
             gradient_accumulation_steps
         )
@@ -63,30 +63,23 @@ class InRankerTrainer:
         # This is required to allow on-the-fly transformation on the dataset
         self.training_arguments.remove_unused_columns = False
 
-        if device is not None:
-            self.training_arguments.device = device
-        else:
-            self.training_arguments.device = (
-                "cuda:0" if torch.cuda.is_available() else "cpu"
-            )
         print(f"Using device: {self.training_arguments.device}")
 
         for key, value in kwargs.items():
             setattr(self.training_arguments, key, value)
 
-        print(f"Loading tokenizer: {self.model}...")
-        self.tokenizer = T5Tokenizer.from_pretrained(self.model)
+        print(f"Loading tokenizer: {model}...")
+        self.tokenizer = T5Tokenizer.from_pretrained(model)
         print("Tokenizer loaded.")
-        self.config = AutoConfig.from_pretrained(self.model)
+        self.config = AutoConfig.from_pretrained(model)
         self.config.num_labels = 1
         self.config.problem_type = "regression"
 
-        print(f"Loading model: {self.model}...")
-        model = T5ForConditionalGeneration.from_pretrained(
-            self.model, config=self.config
+        print(f"Loading model: {model}...")
+        self.model = T5ForConditionalGeneration.from_pretrained(
+            model, config=self.config
         )
         print("Model loaded.")
-        self.total_training_e
 
     def load_msmarco_dataset(
         self,
@@ -124,29 +117,22 @@ class InRankerTrainer:
         ]
         queries = {item["id"]: item["text"] for item in queries_dataset}
 
+        total_examples = 0
         training_data = {"query": [], "text": [], "label": []}
         with open(msmarco_tsv_file, "r", encoding="utf8") as fin:
             for line in fin:
-                (
-                    positive_score,
-                    negative_score,
-                    query_id,
-                    positive_id,
-                    negative_id,
-                ) = line.strip().split("\t")
-            query_id, positive_id, negative_id = (
-                int(query_id),
-                int(positive_id),
-                int(negative_id),
-            )
-            positive_label = float(positive_score)
-            negative_label = float(negative_score)
-            training_data["query"].append(query_id)
-            training_data["text"].append(positive_id)
-            training_data["label"].append(positive_label)
-            training_data["query"].append(query_id)
-            training_data["text"].append(negative_id)
-            training_data["label"].append(negative_label)
+                positive_score, negative_score, query_id, doc_id = line.strip().split(
+                    "\t"
+                )
+                training_data["query"].append(int(query_id))
+                training_data["text"].append(int(doc_id))
+                training_data["label"].append(
+                    [float(negative_score), float(positive_score)]
+                )
+
+                total_examples += 1
+                if total_examples >= 12800000:
+                    break
 
         train_dataset = Dataset.from_dict(training_data)
         train_dataset.set_transform(
@@ -208,7 +194,7 @@ class InRankerTrainer:
         )
         return train_dataset
 
-    def train(self, train_dataset, output_dir: str, resume_training=False):
+    def train(self, train_dataset, resume_training=False):
         """
         Train the model.
         Args:
@@ -223,8 +209,8 @@ class InRankerTrainer:
             tokenizer=self.tokenizer,
         )
         train_result = trainer.train(resume_from_checkpoint=resume_training)
-        trainer.save_model(output_dir)
-        trainer.save_state(output_dir)
+        trainer.save_model()
+        trainer.save_state()
         return train_result
 
     @staticmethod
