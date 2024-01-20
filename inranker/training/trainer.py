@@ -12,8 +12,6 @@ from transformers import (
     TrainingArguments,
 )
 
-from .utils import tokenize
-
 
 class InRankerTrainer:
     def __init__(
@@ -152,7 +150,7 @@ class InRankerTrainer:
 
         train_dataset = Dataset.from_dict(training_data)
         train_dataset.set_transform(
-            lambda batch: tokenize(
+            lambda batch: self.tokenize(
                 batch,
                 self.tokenizer,
                 max_length=max_length,
@@ -206,7 +204,7 @@ class InRankerTrainer:
 
         train_dataset = Dataset.from_dict(training_data)
         train_dataset.set_transform(
-            lambda batch: tokenize(batch, self.tokenizer, max_length=max_length)
+            lambda batch: self.tokenize(batch, self.tokenizer, max_length=max_length)
         )
         return train_dataset
 
@@ -229,6 +227,7 @@ class InRankerTrainer:
         trainer.save_state(output_dir)
         return train_result
 
+    @staticmethod
     def tokenize(
         batch,
         tokenizer,

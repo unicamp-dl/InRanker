@@ -1,18 +1,24 @@
 # InRanker
+
 This library provides a simple way for testing the InRanker models, which are also directly accessible at [Hugging Face](https://huggingface.co/unicamp-dl)
 
 ## Setup
+
 This library was tested using python 3.10 and can be installed using pip.
+
 ```bash
-pip install inranker 
+pip install inranker
 ```
 
 ## Usage
+
 The library provides a simple interface to rank documents given a query. The following example shows how to rank documents using the InRanker-small model.
 There are three sizes available:
+
 - [unicamp-dl/InRanker-small](https://huggingface.co/unicamp-dl/InRanker-small)
 - [unicamp-dl/InRanker-base](https://huggingface.co/unicamp-dl/InRanker-base)
 - [unicamp-dl/InRanker-3B](https://huggingface.co/unicamp-dl/InRanker-3B)
+
 ```python
 from inranker import T5Ranker
 
@@ -39,9 +45,10 @@ sorted_scores = [
 ```
 
 ## How to Cite
+
 ```
 @misc{laitz2024inranker,
-      title={InRanker: Distilled Rankers for Zero-shot Information Retrieval}, 
+      title={InRanker: Distilled Rankers for Zero-shot Information Retrieval},
       author={Thiago Laitz and Konstantinos Papakostas and Roberto Lotufo and Rodrigo Nogueira},
       year={2024},
       eprint={2401.06910},
