@@ -117,6 +117,7 @@ class InRankerTrainer:
                 url=InRankerDatasets.msmarco_url.value,
                 destination="msmarco.tsv",
                 checksum=InRankerDatasets.msmarco_md5.value,
+                desc="Downloading MS MARCO soft labels dataset...",
             )
             msmarco_tsv_file = "msmarco.tsv"
 
@@ -188,6 +189,7 @@ class InRankerTrainer:
                 url=InRankerDatasets.beir_url.value,
                 destination="beir_logits.jsonl",
                 checksum=InRankerDatasets.beir_md5.value,
+                desc="Downloading BEIR soft labels dataset...",
             )
             distill_file = "beir_logits.jsonl"
 
