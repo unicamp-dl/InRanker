@@ -12,6 +12,8 @@ from transformers import (
     TrainingArguments,
 )
 
+from .utils import InRankerDatasets, download_file_from_huggingface
+
 
 class InRankerTrainer:
     def __init__(
@@ -21,7 +23,7 @@ class InRankerTrainer:
         warmup_steps: int = 20000,
         num_train_epochs: float = 1.0,
         logging_steps: int = 1000,
-        save_steps: int = 30000,
+        save_steps: int = 40000,
         learning_rate: float = 7e-5,
         gradient_accumulation_steps: int = 1,
         bf16: bool = False,
@@ -62,6 +64,7 @@ class InRankerTrainer:
         self.training_arguments.gradient_checkpointing = gradient_checkpointing
         # This is required to allow on-the-fly transformation on the dataset
         self.training_arguments.remove_unused_columns = False
+        self.training_arguments.do_eval = False
 
         print(f"Using device: {self.training_arguments.device}")
 
@@ -83,12 +86,13 @@ class InRankerTrainer:
 
     def load_msmarco_dataset(
         self,
-        msmarco_tsv_file: str,
+        msmarco_tsv_file: str = None,
         language: str = "english",
         max_length: int = 512,
     ):
         """
         Load the MS-MARCO dataset from the distillation file.
+        If the file is not provided, it will be downloaded from HuggingFace.
         Args:
             msmarco_tsv_file: Path to the MS-MARCO TSV file.
             language: Language of the dataset.
@@ -101,12 +105,20 @@ class InRankerTrainer:
                 - positive_id: int containing the positive document id.
                 - negative_id: int containing the negative document id.
         """
-        assert os.path.isfile(
-            msmarco_tsv_file
-        ), f"Distill file {msmarco_tsv_file} does not exist."
-        assert msmarco_tsv_file.endswith(
-            ".tsv"
-        ), f"Distill file {msmarco_tsv_file} is not a tsv file."
+        if msmarco_tsv_file:
+            assert os.path.isfile(
+                msmarco_tsv_file
+            ), f"Distill file {msmarco_tsv_file} does not exist."
+            assert msmarco_tsv_file.endswith(
+                ".tsv"
+            ), f"Distill file {msmarco_tsv_file} is not a tsv file."
+        else:
+            download_file_from_huggingface(
+                url=InRankerDatasets.msmarco_url.value,
+                destination="msmarco.tsv",
+                checksum=InRankerDatasets.msmarco_md5.value,
+            )
+            msmarco_tsv_file = "msmarco.tsv"
 
         corpus = load_dataset("unicamp-dl/mmarco", f"collection-{language}")[
             "collection"
@@ -149,11 +161,12 @@ class InRankerTrainer:
 
     def load_custom_dataset(
         self,
-        distill_file: str,
+        distill_file: str = None,
         max_length: int = 512,
     ):
         """
         Load the dataset from the distillation file.
+        if the file is not provided, it will be downloaded from HuggingFace.
         Args:
             distill_file: Path to the distillation file.
         Expected format:
@@ -163,15 +176,23 @@ class InRankerTrainer:
                 - true_logit: float containing the true logit.
                 - false_logit: float containing the false logit.
         """
-        assert os.path.isfile(
-            distill_file
-        ), f"Distill file {distill_file} does not exist."
-        assert distill_file.endswith(
-            ".jsonl"
-        ), f"Distill file {distill_file} is not a jsonl file."
+        if distill_file:
+            assert os.path.isfile(
+                distill_file
+            ), f"Distill file {distill_file} does not exist."
+            assert distill_file.endswith(
+                ".jsonl"
+            ), f"Distill file {distill_file} is not a jsonl file."
+        else:
+            download_file_from_huggingface(
+                url=InRankerDatasets.beir_url.value,
+                destination="beir_logits.jsonl",
+                checksum=InRankerDatasets.beir_md5.value,
+            )
+            distill_file = "beir_logits.jsonl"
 
         training_data = {"query": [], "text": [], "label": []}
-        with open("distill_file", "r", encoding="utf8") as fin:
+        with open(distill_file, "r", encoding="utf8") as fin:
             for line in fin:
                 try:
                     data = json.loads(line)
