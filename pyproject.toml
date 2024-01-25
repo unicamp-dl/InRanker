@@ -16,5 +16,7 @@ dependencies = [
     "sentencepiece==0.1.99",
     "protobuf==3.20.1",
     "datasets==2.9.0",
-    "accelerate==0.20.1"
+    "accelerate==0.20.1",
+    "tqdm==4.66.1",
+    "requests==2.31.0",
 ]
