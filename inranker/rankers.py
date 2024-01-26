@@ -35,12 +35,15 @@ class T5Ranker(Retriever):
             print("Using the model:", model_name_or_path)
 
     @torch.no_grad()
-    def get_scores(self, query: str, docs: List[str]) -> List[float]:
+    def get_scores(
+        self, query: str, docs: List[str], max_length: int = 512
+    ) -> List[float]:
         """
         Given a query and a list of documents, return a list of scores.
         Args:
             query: The query string.
             docs: A list of document strings.
+            max_length: The maximum length of the input sequence.
         """
         scores = []
         for batch in tqdm(
@@ -57,7 +60,7 @@ class T5Ranker(Retriever):
                 padding=True,
                 truncation="longest_first",
                 return_tensors="pt",
-                max_length=512,
+                max_length=max_length,
             ).to(self.device)
             input_ids = tokenized["input_ids"].to(self.device)
             attention_mask = tokenized["attention_mask"].to(self.device)
