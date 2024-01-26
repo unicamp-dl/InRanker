@@ -251,16 +251,38 @@ class InRankerTrainer:
             batch: A batch of data.
             tokenizer: A HuggingFace tokenizer.
             max_length: The maximum length of the input sequence (tokens).
-            from_msmarco:
-            msmarco_queries:
-            msmarco_corpus:
+            from_msmarco: Boolean indicating if the data is from MS MARCO dataset.
+            msmarco_queries: The queries from the MS MARCO dataset.
+            msmarco_corpus: The corpus from the MS MARCO dataset.
         """
         queries_documents = []
         for query, document in zip(batch["query"], batch["text"]):
             # msmarco queries and documents are passed as an ID
             query = msmarco_queries[query] if from_msmarco else query
             document = msmarco_corpus[document] if from_msmarco else document
-            queries_documents.append(f"Query: {query} Document: {document} Relevant:")
+
+            # Tokenize query and document separately
+            tokenized_query = tokenizer.encode(query, add_special_tokens=False)
+            tokenized_document = tokenizer.encode(document, add_special_tokens=False)
+
+            # Calculate space for "Relevant" tag and adjust max_length accordingly
+            relevant_tag_space = (
+                10  # For "Relevant", special tokens, and extra safe space
+            )
+            adjusted_max_length = max_length - relevant_tag_space - len(tokenized_query)
+
+            # Truncate only the document to fit within adjusted_max_length
+            if len(tokenized_document) > adjusted_max_length:
+                tokenized_document = tokenized_document[:adjusted_max_length]
+
+            # Convert tokens back to text and add "Relevant" tag
+            text_query = tokenizer.decode(tokenized_query, skip_special_tokens=True)
+            text_document = tokenizer.decode(
+                tokenized_document, skip_special_tokens=True
+            )
+            queries_documents.append(
+                f"Query: {text_query} Document: {text_document} Relevant:"
+            )
 
         tokenized = tokenizer(
             queries_documents,
