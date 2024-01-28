@@ -261,7 +261,7 @@ class InRankerTrainer:
         for query, document in zip(batch["query"], batch["text"]):
             # msmarco queries and documents are passed as an ID
             query = msmarco_queries[query] if from_msmarco else query
-            document = msmarco_corpus[document] if from_msmarco else document
+            document = msmarco_corpus[document]["text"] if from_msmarco else document
 
             # Tokenize query and document separately
             tokenized_query = tokenizer.encode(query, add_special_tokens=False)
