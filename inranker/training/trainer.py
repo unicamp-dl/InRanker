@@ -153,7 +153,7 @@ class InRankerTrainer:
         train_dataset.set_transform(
             lambda batch: self.tokenize(
                 batch,
-                self.tokenizer,
+                tokenizer=self.tokenizer,
                 max_length=max_length,
                 from_msmarco=True,
                 msmarco_queries=queries,
@@ -238,6 +238,7 @@ class InRankerTrainer:
         trainer.save_state()
         return train_result
 
+    @staticmethod
     def tokenize(
         batch,
         tokenizer,
