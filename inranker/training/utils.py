@@ -1,4 +1,5 @@
 import hashlib
+import os
 from enum import Enum
 
 import requests
@@ -23,6 +24,9 @@ def download_file_from_huggingface(
         checksum (str): MD5 checksum of the file.
         desc (str): Description to show in the progress bar.
     """
+    if os.path.exists(destination):
+        print("Using cached file:", destination)
+        return
     response = requests.get(url, stream=True)
     total_size_in_bytes = int(response.headers.get("content-length", 0))
     block_size = 1024

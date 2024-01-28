@@ -60,6 +60,8 @@ class InRankerTrainer:
         self.training_arguments.gradient_accumulation_steps = (
             gradient_accumulation_steps
         )
+        self.training_arguments.dataloader_num_workers = 4
+
         self.training_arguments.bf16 = bf16
         self.training_arguments.gradient_checkpointing = gradient_checkpointing
         # This is required to allow on-the-fly transformation on the dataset
@@ -236,7 +238,6 @@ class InRankerTrainer:
         trainer.save_state()
         return train_result
 
-    @staticmethod
     def tokenize(
         batch,
         tokenizer,
@@ -267,7 +268,7 @@ class InRankerTrainer:
 
             # Calculate space for "Relevant" tag and adjust max_length accordingly
             relevant_tag_space = (
-                10  # For "Relevant", special tokens, and extra safe space
+                10  # for "Relevant", special tokens, and extra safe space
             )
             adjusted_max_length = max_length - relevant_tag_space - len(tokenized_query)
 
