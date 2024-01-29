@@ -263,7 +263,9 @@ class InRankerTrainer:
             query = msmarco_queries[query] if from_msmarco else query
             document = msmarco_corpus[document]["text"] if from_msmarco else document
 
-            # Tokenize query and document separately
+            query = f"Query: {query}"
+            document = f"Document: {document}"
+            # Tokenize query and document
             tokenized_query = tokenizer.encode(query, add_special_tokens=False)
             tokenized_document = tokenizer.encode(document, add_special_tokens=False)
 
@@ -273,25 +275,27 @@ class InRankerTrainer:
             )
             adjusted_max_length = max_length - relevant_tag_space - len(tokenized_query)
 
-            # Truncate only the document to fit within adjusted_max_length
-            if len(tokenized_document) > adjusted_max_length:
-                tokenized_document = tokenized_document[:adjusted_max_length]
+            # Truncate document tokens
+            tokenized_document = tokenized_document[:adjusted_max_length]
 
-            # Convert tokens back to text and add "Relevant" tag
-            text_query = tokenizer.decode(tokenized_query, skip_special_tokens=True)
-            text_document = tokenizer.decode(
-                tokenized_document, skip_special_tokens=True
-            )
-            queries_documents.append(
-                f"Query: {text_query} Document: {text_document} Relevant:"
+            # Concatenate query and document tokens
+            query_document_tokens = (
+                tokenized_query
+                + tokenized_document
+                + tokenizer.encode(" Relevant:", add_special_tokens=False)
             )
 
-        tokenized = tokenizer(
-            queries_documents,
+            # Ensure the concatenated tokens fit within the max_length
+            if len(query_document_tokens) > max_length:
+                query_document_tokens = query_document_tokens[:max_length]
+
+            queries_documents.append(query_document_tokens)
+
+        tokenized = tokenizer.pad(
+            {"input_ids": queries_documents},
             padding="max_length",
-            truncation=True,
-            return_tensors="pt",
             max_length=max_length,
+            return_tensors="pt",
         )
         tokenized["labels"] = [[label] for label in batch["label"]]
         return tokenized
