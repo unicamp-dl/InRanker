@@ -5,10 +5,10 @@ import torch
 from tqdm.auto import tqdm
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
-from .retriever import Retriever
+from .base import BaseRanker
 
 
-class T5Ranker(Retriever):
+class T5Ranker(BaseRanker):
     def __init__(self, model_name_or_path: str = "unicamp-dl/InRanker-base", **kwargs):
         """
         MonoT5Ranker is a wrapper for the MonoT5 model for ranking.
@@ -36,7 +36,11 @@ class T5Ranker(Retriever):
 
     @torch.no_grad()
     def get_scores(
-        self, query: str, docs: List[str], max_length: int = 512
+        self,
+        query: str,
+        docs: List[str],
+        max_length: int = 512,
+        return_logits: bool = False,
     ) -> List[float]:
         """
         Given a query and a list of documents, return a list of scores.
@@ -44,8 +48,10 @@ class T5Ranker(Retriever):
             query: The query string.
             docs: A list of document strings.
             max_length: The maximum length of the input sequence.
+            return_logits: Whether to return the logits (false_logit, true_logit) for each document.
         """
         scores = []
+        logits = []
         for batch in tqdm(
             self.chunks(docs, self.batch_size),
             disable=self.silent,
@@ -72,10 +78,13 @@ class T5Ranker(Retriever):
                 return_last_logits=True,
             )
             batch_scores = batch_scores[:, [self.token_false_id, self.token_true_id]]
+            logits.extend(batch_scores.tolist())
             batch_scores = torch.log_softmax(batch_scores, dim=-1)
             batch_scores = torch.exp(batch_scores[:, 1])
             batch_scores = batch_scores.tolist()
             scores.extend(batch_scores)
+        if return_logits:
+            return scores, logits
         return scores
 
     @torch.no_grad()

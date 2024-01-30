@@ -66,6 +66,7 @@ class InRankerTrainer:
         self.training_arguments.gradient_checkpointing = gradient_checkpointing
         # This is required to allow on-the-fly transformation on the dataset
         self.training_arguments.remove_unused_columns = False
+        self.training_arguments.evaluation_strategy = "no"
         self.training_arguments.do_eval = False
 
         print(f"Using device: {self.training_arguments.device}")

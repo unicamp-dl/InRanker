@@ -4,8 +4,8 @@ from typing import List
 import torch
 
 
-# This abstract should be used for all retrievers
-class Retriever(ABC):
+# This abstract should be used for all rerankers
+class BaseRanker(ABC):
     def __init__(
         self,
         fp16: bool = False,
@@ -15,7 +15,7 @@ class Retriever(ABC):
         silent: bool = True,
     ):
         """
-        Retriever is an abstract class for a retriever model.
+        BaseRanker is an abstract class for a reranker model.
         Args:
             fp16: Whether to use fp16 precision.
             bf16: Whether to use bf16 precision.
