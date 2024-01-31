@@ -9,20 +9,33 @@ from .base import BaseRanker
 
 
 class T5Ranker(BaseRanker):
-    def __init__(self, model_name_or_path: str = "unicamp-dl/InRanker-base", **kwargs):
+    def __init__(
+        self,
+        model_name_or_path: str = "unicamp-dl/InRanker-base",
+        fp8: bool = False,
+        **kwargs,
+    ):
         """
         MonoT5Ranker is a wrapper for the MonoT5 model for ranking.
+        And it is based on Pygaggle.
+        https://github.com/castorini/pygaggle
         Args:
             model_name_or_path: Path to the MonoT5 model.
+            fp8: Whether to use fp8 precision.
         """
         super().__init__(**kwargs)
         model_args = {}
 
-        model_args["torch_dtype"] = self.precision
+        model_args["torch_dtype"] = self.precision if not fp8 else torch.float16
+        if fp8:
+            model_args["load_in_8bit"] = True
+            model_args["device_map"] = "auto"
 
         self.model = AutoModelForSeq2SeqLM.from_pretrained(
             model_name_or_path, **model_args
-        ).to(self.device)
+        )
+        if not fp8:
+            self.model.to(self.device)
         self.model.eval()
 
         # Get tokenizer and relevance token IDs

@@ -44,6 +44,10 @@ sorted_scores = [
 """
 ```
 
+## Docs
+
+You can find more information about the library, including details on how to train the model and generate soft labels for custom datasets, in the [docs](docs/) folder.
+
 ## How to Cite
 
 ```

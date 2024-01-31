@@ -11,12 +11,13 @@ authors = [
 requires-python = ">=3.10"
 
 dependencies = [
-    "torch==2.1.1",
-    "transformers==4.27.4",
-    "sentencepiece==0.1.99",
-    "protobuf==3.20.1",
-    "datasets==2.9.0",
     "accelerate==0.20.1",
-    "tqdm==4.66.1",
+    "bitsandbytes==0.41.1",
+    "datasets==2.9.0",
+    "protobuf==3.20.1",
     "requests==2.31.0",
+    "sentencepiece==0.1.99",
+    "torch==2.1.1",
+    "tqdm==4.66.1",
+    "transformers==4.27.4",
 ]
