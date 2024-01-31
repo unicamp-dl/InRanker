@@ -4,15 +4,20 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "inranker"
-version = "0.1"
+version = "1.1.0"
 authors = [
     { name = "Thiago Laitz", email = "thiagolaitz@gmail.com" },
 ]
 requires-python = ">=3.10"
 
 dependencies = [
-    "torch==2.1.1",
-    "transformers==4.36.1",
+    "accelerate==0.20.1",
+    "bitsandbytes==0.41.1",
+    "datasets==2.9.0",
+    "protobuf==3.20.1",
+    "requests==2.31.0",
     "sentencepiece==0.1.99",
-    "protobuf==4.25.1",
+    "torch==2.1.1",
+    "tqdm==4.66.1",
+    "transformers==4.27.4",
 ]

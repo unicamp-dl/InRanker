@@ -1,20 +1,21 @@
 from abc import ABC, abstractmethod
 from typing import List
+
 import torch
 
 
-# This abstract should be used for all retrievers
-class Retriever(ABC):
+# This abstract should be used for all rerankers
+class BaseRanker(ABC):
     def __init__(
-            self, 
-            fp16: bool = False,
-            bf16: bool = False,
-            batch_size: int = 32,
-            device: str = "cuda" if torch.cuda.is_available() else "cpu",
-            silent: bool = True
-        ):
+        self,
+        fp16: bool = False,
+        bf16: bool = False,
+        batch_size: int = 32,
+        device: str = "cuda" if torch.cuda.is_available() else "cpu",
+        silent: bool = True,
+    ):
         """
-        Retriever is an abstract class for a retriever model.
+        BaseRanker is an abstract class for a reranker model.
         Args:
             fp16: Whether to use fp16 precision.
             bf16: Whether to use bf16 precision.
@@ -47,9 +48,9 @@ class Retriever(ABC):
         This method is called to get a score for each document given a query.
         """
         pass
-    
+
     @staticmethod
-    def chunks(l, n):
+    def chunks(l, n):  # noqa: E741
         """
         This method is used to split a list l into chunks of batch size n.
         """
