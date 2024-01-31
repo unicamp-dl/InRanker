@@ -3,11 +3,9 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "inranker"
+name = "distillranker"
 version = "1.1.0"
-authors = [
-    { name = "Thiago Laitz", email = "thiagolaitz@gmail.com" },
-]
+authors = []
 requires-python = ">=3.10"
 
 dependencies = [

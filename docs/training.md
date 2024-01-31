@@ -1,24 +1,24 @@
 # Training
 
-This guide provides the steps for training the InRanker model using the library. Details about the model and datasets are found in the [paper](https://arxiv.org/abs/2401.06910).
+This guide provides the steps for training the distillranker model using the library. Details about the model and datasets are found in the paper.
 
 ## Datasets
 
-Training the InRanker models involves two distillation steps:
+Training the distillranker models involves two distillation steps:
 
-- First, we start by training a T5 model using the MS Marco soft labels: [link](https://huggingface.co/datasets/unicamp-dl/InRanker-msmarco)
-- Then, we finetune the model using the BEIR soft labels: [link](https://huggingface.co/datasets/unicamp-dl/InRanker-beir)
+- First, we start by training a T5 model using the MS Marco soft labels: link
+- Then, we finetune the model using the BEIR soft labels: link
 
 ## Training Steps
 
-- Create a conda environment with python 3.10: `conda create -n inranker python=3.10`
-- Install the library: `pip install inranker`
+- Create a conda environment with python 3.10: `conda create -n distillranker python=3.10`
+- Install the library: `pip install distillranker`
 - Distill the model on MS Marco:
 
 ```python
-from inranker import InRankerTrainer
+from distillranker import distillrankerTrainer
 
-trainer = InRankerTrainer(
+trainer = distillrankerTrainer(
     model="t5-small",
     batch_size=32,
     gradient_accumulation_steps=1,
@@ -35,9 +35,9 @@ trainer.train(train_dataset=train_dataset)
 - Finetune the model on BEIR:
 
 ```python
-from inranker import InRankerTrainer
+from distillranker import distillrankerTrainer
 
-trainer = InRankerTrainer(
+trainer = distillrankerTrainer(
     model="my-msmarco-trained-model",
     batch_size=32,
     gradient_accumulation_steps=1,
@@ -69,10 +69,10 @@ If you want to finetune the model using a custom dataset, you can use the `load_
 
 In the paper, we used a dataset with 10.5M query-documents using 1.05M synthetic queries generated using [InPars-v1](https://github.com/zetaalphavector/InPars). We also included 9 "negative" documents for each query which were sampled from the same collection from the top-1000 documents retrieved by BM25 (using the [pyserini implementation](https://github.com/castorini/pyserini)).
 
-For generating the teacher soft labels, simply set a flag return_logits on Inranker, and it will return the scores and the logits for each query-document pair (negative_logit, positive_logit):
+For generating the teacher soft labels, simply set a flag return_logits on distillranker, and it will return the scores and the logits for each query-document pair (negative_logit, positive_logit):
 
 ```python
-from inranker import T5Ranker
+from distillranker import T5Ranker
 
 model = T5Ranker(
     model_name_or_path="castorini/monot5-3b-msmarco-10k",
@@ -81,7 +81,7 @@ model = T5Ranker(
 
 docs = [
     "The capital of France is Paris",
-    "Learn deep learning with InRanker and transformers"
+    "Learn deep learning with distillranker and transformers"
 ]
 
 scores, logits = model.get_scores(

@@ -1,1 +1,1 @@
-from .trainer import InRankerTrainer  # noqa: F401
+from .trainer import distillrankerTrainer  # noqa: F401

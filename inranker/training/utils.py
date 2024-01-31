@@ -6,10 +6,10 @@ import requests
 from tqdm.auto import tqdm
 
 
-class InRankerDatasets(Enum):
-    msmarco_url: str = "https://huggingface.co/datasets/unicamp-dl/InRanker-msmarco/resolve/main/InRanker_msmarco.tsv"
+class distillrankerDatasets(Enum):
+    msmarco_url: str = "https://huggingface.co/datasets/anonymous/distillranker-msmarco/resolve/main/distillranker_msmarco.tsv"
     msmarco_md5: str = "3fc9840ea2a8ad17966dec11c48872bf"
-    beir_url: str = "https://huggingface.co/datasets/unicamp-dl/InRanker-BEIR/resolve/main/inpars_beir_dataset.jsonl"
+    beir_url: str = "https://huggingface.co/datasets/anonymous/distillranker-BEIR/resolve/main/inpars_beir_dataset.jsonl"
     beir_md5: str = "89d914af6d231a32458fcf84a8de61a6"
 
 

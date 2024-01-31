@@ -11,7 +11,7 @@ from .base import BaseRanker
 class T5Ranker(BaseRanker):
     def __init__(
         self,
-        model_name_or_path: str = "unicamp-dl/InRanker-base",
+        model_name_or_path: str = "anonymous/distillranker-base",
         fp8: bool = False,
         **kwargs,
     ):

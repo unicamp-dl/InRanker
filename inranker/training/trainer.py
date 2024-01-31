@@ -12,10 +12,10 @@ from transformers import (
     TrainingArguments,
 )
 
-from .utils import InRankerDatasets, download_file_from_huggingface
+from .utils import distillrankerDatasets, download_file_from_huggingface
 
 
-class InRankerTrainer:
+class DistillRankerTrainer:
     def __init__(
         self,
         model: str = "t5-small",
@@ -117,18 +117,18 @@ class InRankerTrainer:
             ), f"Distill file {msmarco_tsv_file} is not a tsv file."
         else:
             download_file_from_huggingface(
-                url=InRankerDatasets.msmarco_url.value,
+                url=distillrankerDatasets.msmarco_url.value,
                 destination="msmarco.tsv",
-                checksum=InRankerDatasets.msmarco_md5.value,
+                checksum=distillrankerDatasets.msmarco_md5.value,
                 desc="Downloading MS MARCO soft labels dataset...",
             )
             msmarco_tsv_file = "msmarco.tsv"
 
-        corpus = load_dataset("unicamp-dl/mmarco", f"collection-{language}")[
+        corpus = load_dataset("anonymous/mmarco", f"collection-{language}")[
             "collection"
         ]
 
-        queries_dataset = load_dataset("unicamp-dl/mmarco", f"queries-{language}")[
+        queries_dataset = load_dataset("anonymous/mmarco", f"queries-{language}")[
             "train"
         ]
         queries = {item["id"]: item["text"] for item in queries_dataset}
@@ -189,9 +189,9 @@ class InRankerTrainer:
             ), f"Distill file {distill_file} is not a jsonl file."
         else:
             download_file_from_huggingface(
-                url=InRankerDatasets.beir_url.value,
+                url=distillrankerDatasets.beir_url.value,
                 destination="beir_logits.jsonl",
-                checksum=InRankerDatasets.beir_md5.value,
+                checksum=distillrankerDatasets.beir_md5.value,
                 desc="Downloading BEIR soft labels dataset...",
             )
             distill_file = "beir_logits.jsonl"
